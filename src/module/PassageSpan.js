@@ -1,4 +1,4 @@
-import { expandPathToNode, focusNode, hoverNode } from '.stores/ui';
+import { expandPathToNode, focusNode, hoverNode } from './stores/ui';
 import { useStore } from './stores/useStore';
 
 import PropTypes from 'prop-types';
