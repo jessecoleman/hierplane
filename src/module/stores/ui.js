@@ -11,6 +11,8 @@ export const COLLAPSE_DESCENDANTS = 'COLLAPSE_DESCENDANTS';
 export const EXPAND_NODE = 'EXPAND_NODE';
 export const EXPAND_ALL_NODES = 'EXPAND_ALL_NODES';
 export const EXPAND_PATH_TO_NODE = 'EXPAND_PATH_TO_NODE';
+export const HOVER_NODE = 'HOVER_NODE';
+export const FOCUS_NODE = 'FOCUS_NODE';
 
 /**
  * Action Creators
@@ -22,12 +24,10 @@ export const EXPAND_PATH_TO_NODE = 'EXPAND_PATH_TO_NODE';
  * @param {Immutable.Set} ids - the node ids to be added
  * @returns {object}
  */
-export function addAllNodeIds(ids) {
-  return {
-    ids,
-    type: ADD_ALL_NODE_IDS,
-  };
-}
+export const addAllNodeIds = (ids) => ({
+  ids,
+  type: ADD_ALL_NODE_IDS,
+});
 
 /**
  * Toggle the collapsed/expanded state of a node.
@@ -35,12 +35,10 @@ export function addAllNodeIds(ids) {
  * @param {string} id - the id of the node to be toggled
  * @returns {object}
  */
-export function toggleNode(id) {
-  return {
-    id,
-    type: TOGGLE_NODE_STATE,
-  };
-}
+export const toggleNode = (id) => ({
+  id,
+  type: TOGGLE_NODE_STATE,
+});
 
 /**
  * Explicitly collapse a node.
@@ -48,12 +46,10 @@ export function toggleNode(id) {
  * @param {string} id - the id of the node to be collapsed
  * @returns {object}
  */
-export function collapseNode(id) {
-  return {
-    id,
-    type: COLLAPSE_NODE,
-  };
-}
+export const collapseNode = (id) => ({
+  id,
+  type: COLLAPSE_NODE,
+});
 
 /**
  * Explicitly expand a node.
@@ -61,34 +57,28 @@ export function collapseNode(id) {
  * @param {string} id - the id of the node to be expanded
  * @returns {object}
  */
-export function expandNode(id) {
-  return {
-    id,
-    type: EXPAND_NODE,
-  };
-}
+export const expandNode = (id) => ({
+  id,
+  type: EXPAND_NODE,
+});
 
 /**
  * Collapse all nodes.
  *
  * @returns {object}
  */
-export function collapseAllNodes() {
-  return {
-    type: COLLAPSE_ALL_NODES,
-  };
-}
+export const collapseAllNodes = () => ({
+  type: COLLAPSE_ALL_NODES,
+});
 
 /**
  * Expand all nodes.
  *
  * @returns {object}
  */
-export function expandAllNodes() {
-  return {
-    type: EXPAND_ALL_NODES,
-  };
-}
+export const expandAllNodes = () => ({
+  type: EXPAND_ALL_NODES,
+});
 
 /**
  * Collapse decendants for a given node id. When navigating between parses on a focused node, we
@@ -98,12 +88,10 @@ export function expandAllNodes() {
  * @param {string} id - The node id that we're fetching an alternate parse for.
  * @returns {object}
  */
-export function collapseDescendants(id) {
-  return {
-    id,
-    type: COLLAPSE_DESCENDANTS,
-  };
-}
+export const collapseDescendants = (id) => ({
+  id,
+  type: COLLAPSE_DESCENDANTS,
+});
 
 /**
  * Expand the path to the clicked node.
@@ -111,17 +99,36 @@ export function collapseDescendants(id) {
  * @param {string} id - The node id that we're exposing the path to.
  * @returns {object}
  */
-export function expandPathToNode(id) {
-  return {
-    id,
-    type: EXPAND_PATH_TO_NODE,
-  };
-}
+export const expandPathToNode = (id) => ({
+  id,
+  type: EXPAND_PATH_TO_NODE,
+});
+
+export const hoverNode = (nodeId) => ({
+  hoverNodeId: nodeId,
+  type: HOVER_NODE,
+});
+
+export const focusNode = (data) => {
+  if (data !== 'defocus') {
+    return {
+      selectedNode: data,
+      selectedNodeId: data.id,
+      type: FOCUS_NODE,
+    }
+  } else {
+    return {
+      selectedNode: null,
+      selectedNodeId: null,
+      type: FOCUS_NODE,
+    }
+  }
+};
 
 /**
  * UI Reducer
  */
-const initialState = {
+export const initialState = {
   expandableNodeIds: Immutable.Set(),
   expandedNodeIds: Immutable.Set(),
   exploded: false,
@@ -153,7 +160,7 @@ export default (state = initialState, action) => {
         expandedNodeIds: state.expandedNodeIds.filterNot(isChildOf(action.id)),
       };
     case EXPAND_NODE:
-      return (function() {
+      return (() => {
         const { expandedNodeIds, expandableNodeIds } = state;
         const newExpandedNodeIds = expandedNodeIds.add(action.id);
 
@@ -164,7 +171,7 @@ export default (state = initialState, action) => {
         };
       })();
     case TOGGLE_NODE_STATE:
-      return (function() {
+      return (() => {
         const { expandedNodeIds: prevIds, expandableNodeIds } = state;
         const id = action.id;
         const newExpandedNodeIds = prevIds.has(id) ? prevIds.delete(id) : prevIds.add(id);
@@ -186,14 +193,23 @@ export default (state = initialState, action) => {
         ...state,
         expandedNodeIds: state.expandedNodeIds.union(pathToNode(action.id)),
       };
+    case HOVER_NODE:
+      return {
+        ...state,
+        hoverNodeId: action.hoverNodeId
+      }
+    case FOCUS_NODE:
+      return {
+        ...state,
+        selectedNode: action.selectedNode,
+        selectedNodeId: action.selectedNodeId
+      }
     default:
       return state;
   }
 }
 
-function isChildOf(parseId) {
-  return nodeId => nodeId.startsWith(`${parseId}.`);
-}
+const isChildOf = parseId => nodeId => nodeId.startsWith(`${parseId}.`);
 
 /**
  * Returns an Immutable.Set of node ids. The ids are the path from root to that id. For example,
@@ -202,7 +218,7 @@ function isChildOf(parseId) {
  * @param {string} id - the node id to get the path from the root node to.
  * @returns {Immutable.Set}
  */
-function pathToNode(id) {
+const pathToNode = (id) => {
   if (!id) {
     return Immutable.Set();
   }

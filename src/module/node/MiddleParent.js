@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import NodeWord from './NodeWord.js';
 import classNames from 'classnames/bind';
 
-import { colorToString } from '../helpers.js';
+import { colorToString } from '../helpers';
 
 // Converts an array of classes to string.
 function stylesToString(arr = []) {
@@ -12,134 +12,131 @@ function stylesToString(arr = []) {
   }, "");
 }
 
-class MiddleParent extends Component {
+const MiddleParent = ({
+  readOnly,
+  canonicalChildren,
+  hasChildren,
+  hasSideChildren,
+  hasInsideChildren,
+  hasDownChildren,
+  layout,
+  positions,
+  linkLabels,
+  data,
+  depth,
+  styles,
+  active,
+  collapsed,
+  nodeFocusing,
+  dataCollapsable,
+  rollups,
+  isRoot,
+  isSingleSegment,
+  isEventRoot,
+  onMouseOver,
+  onMouseOut,
+  onMouseDown,
+  onMouseUp,
+  onUiMouseOver,
+  onUiMouseOut,
+  onUiMouseUp,
+  onPnMouseOver,
+  onPnMouseOut,
+  onPnMouseUp,
+  text,
+  parentId,
+  togglePane,
+  insideChildren,
+  directionalChildIndex,
+  dataPos,
+  eventSeqChild,
+  encapsulated,
+  notFirstInsideChild,
+  seqType,
+  focused, 
+}) => {
 
-  // TODO: Try to pull as much business logic out of the render function as possible.
-  render() {
-    const { readOnly,
-            canonicalChildren,
-            hasChildren,
-            hasSideChildren,
-            hasInsideChildren,
-            hasDownChildren,
-            layout,
-            positions,
-            linkLabels,
-            data,
-            depth,
-            styles,
-            active,
-            collapsed,
-            nodeFocusing,
-            dataCollapsable,
-            rollups,
-            isRoot,
-            isSingleSegment,
-            isEventRoot,
-            onMouseOver,
-            onMouseOut,
-            onMouseDown,
-            onMouseUp,
-            onUiMouseOver,
-            onUiMouseOut,
-            onUiMouseUp,
-            onPnMouseOver,
-            onPnMouseOut,
-            onPnMouseUp,
-            text,
-            parentId,
-            togglePane,
-            insideChildren,
-            directionalChildIndex,
-            dataPos,
-            eventSeqChild,
-            encapsulated,
-            notFirstInsideChild,
-            seqType,
-            focused } = this.props;
+  const { id, nodeType } = data;
 
-    const { id, nodeType } = data;
+  const altParseInfo = data.alternateParseInfo;
+  const altParses = altParseInfo !== undefined && (altParseInfo.hasOwnProperty("prevParse") || altParseInfo.hasOwnProperty("nextParse"));
+  const nodeCollapsed = dataCollapsable && collapsed && (!hasSideChildren || (hasSideChildren && hasInsideChildren)) && !isRoot && !isEventRoot;
 
-    const altParseInfo = data.alternateParseInfo;
-    const altParses = altParseInfo !== undefined && (altParseInfo.hasOwnProperty("prevParse") || altParseInfo.hasOwnProperty("nextParse"));
-    const nodeCollapsed = dataCollapsable && collapsed && (!hasSideChildren || (hasSideChildren && hasInsideChildren)) && !isRoot && !isEventRoot;
+  // nodeConditionalClasses builds dynamic class lists for .node blocks:
+  const nodeConditionalClasses = classNames({
+    "node--root": isRoot,
+    "node--has-alt-parses": altParses,
+    "node--hover": active === "hover",
+    "node--toggle-ready": active === "toggle-ready",
+    "node--focused": focused,
+    "node--focusing": nodeFocusing,
+    "node--encapsulated": encapsulated,
+    "node-container--collapsed": nodeCollapsed,
+    "node-container--expanded": !nodeCollapsed,
+    "node-container--active": active !== null && hasChildren && !hasSideChildren,
+    [`${stylesToString(styles[data.nodeType])}`]: true,
+    [`node--${colorToString(styles[seqType])}`]: seqType !== null,
+  });
 
-    // nodeConditionalClasses builds dynamic class lists for .node blocks:
-    const nodeConditionalClasses = classNames({
-      "node--root": isRoot,
-      "node--has-alt-parses": altParses,
-      "node--hover": active === "hover",
-      "node--toggle-ready": active === "toggle-ready",
-      "node--focused": focused,
-      "node--focusing": nodeFocusing,
-      "node--encapsulated": encapsulated,
-      "node-container--collapsed": nodeCollapsed,
-      "node-container--expanded": !nodeCollapsed,
-      "node-container--active": active !== null && hasChildren && !hasSideChildren,
-      [`${stylesToString(styles[data.nodeType])}`]: true,
-      [`node--${colorToString(styles[seqType])}`]: seqType !== null,
-    });
+  // Screen Output
+  return (
+    <div className="ft__tr__td ft--middle-parent">
+      {/* Node */}
+      <div className={`node ${nodeConditionalClasses}`}
+        id={id}
+        data-parent-id={(depth > 0) ? parentId : "null"}
+        data-node-type={nodeType}
+        data-pos={dataPos}
+        data-is-root={isRoot}
+        data-is-single-segment={isSingleSegment}
+        data-is-event-root={isEventRoot}
+        data-depth={depth}
+        data-has-children={hasChildren}
+        data-has-side-children={hasSideChildren}
+        data-has-inside-children={hasInsideChildren}
+        data-has-down-children={hasDownChildren}
+        data-collapsable={dataCollapsable}
+        data-directional-child-index={directionalChildIndex}
+        data-alt-parses={altParses} >
+        {/* Node Word */}
+        <NodeWord
+          readOnly={readOnly}
+          depth={depth}
+          layout={layout}
+          dataPos={dataPos}
+          positions={positions}
+          linkLabels={linkLabels}
+          data={data}
+          text={text}
+          dataCollapsable={dataCollapsable}
+          altParses={altParses}
+          rollups={rollups}
+          isRoot={isRoot}
+          isEventRoot={isEventRoot}
+          hasChildren={hasChildren}
+          hasSideChildren={hasSideChildren}
+          hasInsideChildren={hasInsideChildren}
+          onMouseOver={onMouseOver}
+          onMouseOut={onMouseOut}
+          onMouseDown={onMouseDown}
+          onMouseUp={onMouseUp}
+          onUiMouseOver={onUiMouseOver}
+          onUiMouseOut={onUiMouseOut}
+          onUiMouseUp={onUiMouseUp}
+          onPnMouseOver={onPnMouseOver}
+          onPnMouseOut={onPnMouseOut}
+          onPnMouseUp={onPnMouseUp}
+          togglePane={togglePane}
+          insideChildren={insideChildren}
+          encapsulated={encapsulated}
+          eventSeqChild={eventSeqChild}
+          notFirstInsideChild={notFirstInsideChild} />
 
-    // Screen Output
-    return (
-      <div className="ft__tr__td ft--middle-parent">
-        {/* Node */}
-        <div className={`node ${nodeConditionalClasses}`}
-          id={id}
-          data-parent-id={(depth > 0) ? parentId : "null"}
-          data-node-type={nodeType}
-          data-pos={dataPos}
-          data-is-root={isRoot}
-          data-is-single-segment={isSingleSegment}
-          data-is-event-root={isEventRoot}
-          data-depth={depth}
-          data-has-children={hasChildren}
-          data-has-side-children={hasSideChildren}
-          data-has-inside-children={hasInsideChildren}
-          data-has-down-children={hasDownChildren}
-          data-collapsable={dataCollapsable}
-          data-directional-child-index={directionalChildIndex}
-          data-alt-parses={altParses} >
-          {/* Node Word */}
-          <NodeWord
-            readOnly={readOnly}
-            depth={depth}
-            layout={layout}
-            dataPos={dataPos}
-            positions={positions}
-            linkLabels={linkLabels}
-            data={data}
-            text={text}
-            dataCollapsable={dataCollapsable}
-            altParses={altParses}
-            rollups={rollups}
-            isRoot={isRoot}
-            isEventRoot={isEventRoot}
-            hasChildren={hasChildren}
-            hasSideChildren={hasSideChildren}
-            hasInsideChildren={hasInsideChildren}
-            onMouseOver={onMouseOver}
-            onMouseOut={onMouseOut}
-            onMouseDown={onMouseDown}
-            onMouseUp={onMouseUp}
-            onUiMouseOver={onUiMouseOver}
-            onUiMouseOut={onUiMouseOut}
-            onUiMouseUp={onUiMouseUp}
-            onPnMouseOver={onPnMouseOver}
-            onPnMouseOut={onPnMouseOut}
-            onPnMouseUp={onPnMouseUp}
-            togglePane={togglePane}
-            insideChildren={insideChildren}
-            encapsulated={encapsulated}
-            eventSeqChild={eventSeqChild}
-            notFirstInsideChild={notFirstInsideChild} />
-
-          {/* Canonical Children */}
-          {canonicalChildren}
-        </div>
+        {/* Canonical Children */}
+        {canonicalChildren}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 MiddleParent.propTypes = {

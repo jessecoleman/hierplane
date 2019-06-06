@@ -1,188 +1,158 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import PassageSpan from './PassageSpan.js';
+import PassageSpan from './PassageSpan';
 import Icon from './Icon.js';
 import classNames from 'classnames/bind';
+import { useStore } from './stores/useStore';
+import { hoverNode, focusNode } from './stores/ui';
 
-class Passage extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      passageActive: false,
-      focused: false,
-      autoFocus: null,
-    };
-    this.handleFocus = this.handleFocus.bind(this);
-    this.handleBlur = this.handleBlur.bind(this);
-    this.handleMouseOver = this.handleMouseOver.bind(this);
-    this.handleMouseOut = this.handleMouseOut.bind(this);
-    this.handleSpaceBar = this.handleSpaceBar.bind(this);
-    this.handleEsc = this.handleEsc.bind(this);
-  }
+const Passage = ({
+  emptyQuery,
+  readOnly,
+  text,
+  inputText,
+  onKeyPress,
+  onChange,
+  loading,
+  items,
+  styles,
+  errorState,
+}) => {
 
-  componentDidMount() {
-    window.addEventListener('keyup', this.handleSpaceBar);
-  }
+  const { state: { selectedNodeId, hoverNodeId }, dispatch } = useStore();
 
-  componentDidUpdate() {
-    this.handleEmpty();
-  }
+  const [ focused, setFocused ] = useState(false);
+  const [ autoFocus, setAutoFocus ] = useState(null);
+  const [ passageActive, setPassageActive ] = useState(false);
 
-  handleEmpty() {
-    if (this.props.emptyQuery === true) {
-      switch (this.state.autoFocus) {
+  useEffect(() => {
+    window.addEventListener('keyup', handleSpaceBar);
+    return () => {
+      window.removeEventListener('keyup', handleSpaceBar);
+    }
+  }, []);
+
+  useEffect(() => {
+    handleEmpty();
+  }, []);
+
+  const passageInput = useRef(null);
+
+  const handleEmpty = () => {
+    if (emptyQuery === true) {
+      switch (autoFocus) {
         case null:
-          this.setState({
-            autoFocus: true,
-          });
+          setAutoFocus(true);
           break;
         case true:
-          this.handleFocus();
-          this.setState({
-            autoFocus: false,
-          });
+          handleFocus();
+          setAutoFocus(false);
           break;
       }
     }
   }
 
-  handleEsc(e) {
+  const handleEsc = (e) => {
     if (e.keyCode === 27) {
-      this.handleBlur();
+      handleBlur();
     }
   }
 
-  handleSpaceBar(e) {
-    const { readOnly, loading } = this.props;
+  const handleSpaceBar = (e) => {
 
     if (!loading && !readOnly) {
-      if (this.state.focused === false && e.keyCode === 32) {
+      if (focused === false && e.keyCode === 32) {
         e.preventDefault();
-        this.handleFocus();
+        handleFocus();
       }
     }
 
-    if (this.state.focused && e.key === 'Enter' && !readOnly) {
-      this.handleBlur();
+    if (focused && e.key === 'Enter' && !readOnly) {
+      handleBlur();
     }
   }
 
-  handleFocus() {
-    this.setState({
-      focused: true,
-    });
-    ReactDOM.findDOMNode(this.refs.passageInput).focus();
-    this.props.focusNode("defocus");
+  const handleFocus = () => {
+    setFocused(true);
+    ReactDOM.findDOMNode(passageInput).focus();
+    dispatch(focusNode('defocus'));
   }
 
-  handleBlur() {
-    if (this.props.emptyQuery === true) {
-      this.handleFocus();
+  const handleBlur = () => {
+    if (emptyQuery === true) {
+      handleFocus();
     } else {
-      this.setState({
-        focused: false,
-      });
-      ReactDOM.findDOMNode(this.refs.passageInput).blur();
+      setFocused(false);
+      ReactDOM.findDOMNode(passageInput).blur();
     }
   }
 
-  handleMouseOver() {
-    this.setState({
-      passageActive: true,
-    });
-  }
+  const handleMouseOver = () => setPassageActive(true);
+  const handleMouseOut = () => setPassageActive(false);
 
-  handleMouseOut() {
-    this.setState({
-      passageActive: false,
-    });
-  }
+  //render
 
-  componentWillUnmount() {
-    window.removeEventListener('keyup', this.handleSpaceBar);
-  }
+  const passageConditionalClasses = classNames({
+    "passage--editing": focused,
+    "passage--active": passageActive,
+    "passage--loading": loading,
+  });
 
-  render() {
-
-    const { focused, passageActive } = this.state;
-    const { readOnly,
-            text,
-            inputText,
-            onKeyPress,
-            onChange,
-            loading,
-            data,
-            styles,
-            selectedNodeId,
-            hoverNodeId,
-            hoverNode,
-            focusNode,
-            errorState } = this.props;
-
-    const passageConditionalClasses = classNames({
-      "passage--editing": focused,
-      "passage--active": passageActive,
-      "passage--loading": loading,
-    });
-
-    return (
-      <div id="passage" className={passageConditionalClasses}>
-        <div className="passage__focus-trigger"
-          onDoubleClick={!readOnly ? this.handleFocus : () => {}}></div>
-        {!readOnly ? (
-          <textarea
-            ref="passageInput"
-            rows="1"
-            onBlur={this.handleBlur}
-            onKeyPress={onKeyPress}
-            onKeyUp={this.handleEsc}
-            readOnly={readOnly}
-            onChange={onChange}
-            disabled={loading}
-            value={(inputText !== null ? inputText : "")} />
-        ) : null}
-        <p onDoubleClick={!readOnly ? this.handleFocus : () => {}}>
-          <span className="passage__readonly">
-            {loading || errorState ? text : (
+  return (
+    <div id="passage" className={passageConditionalClasses}>
+      <div className="passage__focus-trigger"
+        onDoubleClick={!readOnly ? handleFocus : () => {}}></div>
+      {!readOnly ? (
+        <textarea
+          ref={passageInput}
+          rows="1"
+          onBlur={handleBlur}
+          onKeyPress={onKeyPress}
+          onKeyUp={handleEsc}
+          readOnly={readOnly}
+          onChange={onChange}
+          disabled={loading}
+          value={(inputText !== null ? inputText : "")} />
+      ) : null}
+      <p onDoubleClick={!readOnly ? handleFocus : () => {}}>
+        <span className="passage__readonly">
+          {items.map((item, idx) => (
               <PassageSpan
+                key={idx}
                 text={text}
-                data={data}
+                data={item}
                 styles={styles}
-                selectedNodeId={selectedNodeId}
-                hoverNodeId={hoverNodeId}
-                hoverNode={hoverNode}
-                focusNode={focusNode}
-                depth={0} />
-            )}
-            {!readOnly ? (
-              <span className="passage__edit"
-                onClick={this.handleFocus}
-                onMouseOver={this.handleMouseOver}
-                onMouseOut={this.handleMouseOut}
-                title="Edit query">
-                <Icon symbol="edit" wrapperClass="passage__edit__trigger" />
-              </span>
-            ) : null}
-          </span>
-        </p>
-        <div className="passage__loading-mask"></div>
-      </div>
-    );
-  }
+                depth={0} 
+              />
+          ))}
+          {!readOnly ? (
+            <span className="passage__edit"
+              onClick={handleFocus}
+              onMouseOver={handleMouseOver}
+              onMouseOut={handleMouseOut}
+              title="Edit query">
+              <Icon symbol="edit" wrapperClass="passage__edit__trigger" />
+            </span>
+          ) : null}
+        </span>
+      </p>
+      <div className="passage__loading-mask"></div>
+    </div>
+  );
 }
 
 Passage.propTypes = {
   readOnly: PropTypes.bool,
   text: PropTypes.string.isRequired,
   inputText: PropTypes.string,
-  onKeyPress: PropTypes.func.isRequired,
-  onChange: PropTypes.func.isRequired,
+  //onKeyPress: PropTypes.func.isRequired,
+  //onChange: PropTypes.func.isRequired,
   focusNode: PropTypes.func,
   loading: PropTypes.bool,
   emptyQuery: PropTypes.bool,
   errorState: PropTypes.bool,
-  data: PropTypes.object,
+  items: PropTypes.array,
   styles: PropTypes.object,
   selectedNodeId: PropTypes.string,
   hoverNodeId: PropTypes.string,

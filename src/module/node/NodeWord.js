@@ -2,130 +2,128 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Attributes from './Attributes.js';
 import Link from './Link.js';
-import UiToggle from './UiToggle.js';
-import UiParseNav from './UiParseNav.js';
+import UiToggle from './UiToggle';
+import UiParseNav from './UiParseNav';
 
-class NodeWord extends React.Component {
+const NodeWord = ({
+  readOnly,
+  hasInsideChildren,
+  layout,
+  dataPos,
+  positions,
+  linkLabels,
+  data,
+  text,
+  onMouseOver,
+  onMouseOut,
+  onMouseDown,
+  onMouseUp,
+  onUiMouseOver,
+  onUiMouseOut,
+  onUiMouseUp,
+  onPnMouseOver,
+  onPnMouseOut,
+  onPnMouseUp,
+  dataCollapsable,
+  altParses,
+  rollups,
+  isRoot,
+  isEventRoot,
+  togglePane,
+  insideChildren,
+  eventSeqChild,
+  encapsulated,
+  notFirstInsideChild,
+}) => {
 
-  render() {
-    const { readOnly,
-            hasInsideChildren,
-            layout,
-            dataPos,
-            positions,
-            linkLabels,
-            data,
-            text,
-            onMouseOver,
-            onMouseOut,
-            onMouseDown,
-            onMouseUp,
-            onUiMouseOver,
-            onUiMouseOut,
-            onUiMouseUp,
-            onPnMouseOver,
-            onPnMouseOut,
-            onPnMouseUp,
-            dataCollapsable,
-            altParses,
-            rollups,
-            isRoot,
-            isEventRoot,
-            togglePane,
-            insideChildren,
-            eventSeqChild,
-            encapsulated,
-            notFirstInsideChild } = this.props;
+  // charNodeRoot is the field in the JSON node object that contains its span's
+  // lo and hi values that let the UI extract a phrase from the original query.
+  const hasFragments = data.hasOwnProperty("alternateParseInfo") && data.alternateParseInfo.hasOwnProperty("spanAnnotations");
+  const hasRollup = rollups && dataCollapsable && hasFragments;
+  const fragmentData = hasFragments ? data.alternateParseInfo.spanAnnotations : null;
 
-    // charNodeRoot is the field in the JSON node object that contains its span's
-    // lo and hi values that let the UI extract a phrase from the original query.
-    const hasFragments = data.hasOwnProperty("alternateParseInfo") && data.alternateParseInfo.hasOwnProperty("spanAnnotations");
-    const hasRollup = rollups && dataCollapsable && hasFragments;
-    const fragmentData = hasFragments ? data.alternateParseInfo.spanAnnotations : null;
+  // Max rollup characters before node is forced to text wrap
+  const maxRollupChars = 40;
+  // Boolean that returns true if node span is more than maxRollupChars (used in conditional class of .node__word__label)
+  const wideRollup = hasRollup && (data.alternateParseInfo.charNodeRoot.charHi - data.alternateParseInfo.charNodeRoot.charLo >= maxRollupChars);
 
-    // Max rollup characters before node is forced to text wrap
-    const maxRollupChars = 40;
-    // Boolean that returns true if node span is more than maxRollupChars (used in conditional class of .node__word__label)
-    const wideRollup = hasRollup && (data.alternateParseInfo.charNodeRoot.charHi - data.alternateParseInfo.charNodeRoot.charLo >= maxRollupChars);
+  // Iterates through spanAnnotations to wrap head word ("self") in a <strong> tag
+  // so it is visually distinct from the rest of the rollup text.
+  const rollupText = hasFragments ? fragmentData.map((item, index) => {
+    if (item.spanType === "self") {
+      return (
+        <strong key={index}> {text.slice(item.lo, item.hi)} </strong>
+      );
+    } else {
+      return ` ${text.slice(item.lo, item.hi)} `;
+    }
+  }) : null;
 
-    // Iterates through spanAnnotations to wrap head word ("self") in a <strong> tag
-    // so it is visually distinct from the rest of the rollup text.
-    const rollupText = hasFragments ? fragmentData.map((item, index) => {
-      if (item.spanType === "self") {
-        return (
-          <strong key={index}> {text.slice(item.lo, item.hi)} </strong>
-        );
-      } else {
-        return ` ${text.slice(item.lo, item.hi)} `;
-      }
-    }) : null;
+  const toggle = (
+    <UiToggle
+      onUiMouseOver={onUiMouseOver}
+      onUiMouseOut={onUiMouseOut}
+      onUiMouseUp={onUiMouseUp} />
+  );
 
-    const toggle = (
-      <UiToggle
-        onUiMouseOver={onUiMouseOver}
-        onUiMouseOut={onUiMouseOut}
-        onUiMouseUp={onUiMouseUp} />
-    );
+  const parseNav = (
+    <UiParseNav
+      readOnly={readOnly}
+      data={data}
+      onPnMouseOver={onPnMouseOver}
+      onPnMouseOut={onPnMouseOut}
+      onPnMouseUp={onPnMouseUp} />
+  );
 
-    const parseNav = (
-      <UiParseNav
-        readOnly={readOnly}
-        data={data}
-        onPnMouseOver={onPnMouseOver}
-        onPnMouseOut={onPnMouseOut}
-        onPnMouseUp={onPnMouseUp} />
-    );
+  const focusTrigger = (
+    <div className={`node-focus-trigger ${hasInsideChildren ? "node-focus-trigger--seq" : ""}`}
+      onMouseOver={onMouseOver}
+      onMouseOut={onMouseOut}
+      onMouseDown={onMouseDown}
+      onDoubleClick={() => { togglePane("open") }}
+      onMouseUp={() => { onMouseUp(data) }}>
+    </div>
+  );
 
-    const focusTrigger = (
-      <div className={`node-focus-trigger ${hasInsideChildren ? "node-focus-trigger--seq" : ""}`}
-        onMouseOver={onMouseOver}
-        onMouseOut={onMouseOut}
-        onMouseDown={onMouseDown}
-        onDoubleClick={() => { togglePane("open") }}
-        onMouseUp={() => { onMouseUp(data) }}>
-      </div>
-    );
-
-    return (
-      !isRoot ? (
-        <div className={`node__word
-            ${hasInsideChildren && data.attributes.length > 0 ? "node__word--has-attrs" : ""}
-            ${hasRollup ? "node__word--has-rollup" : ""}`}>
-          {/* Node Word Tile */}
-          <div className="node__word__tile"></div>
-          {/* Left / Top Link */}
-          {((!isEventRoot && data.link && layout === "canonical") ||
-            (!isEventRoot && data.link && layout === "default" && positions[data.link] !== "left" && notFirstInsideChild && !encapsulated && !eventSeqChild)) ?
-            <Link link={data.link} dataPos={dataPos} layout={layout} linkLabels={linkLabels} id={data.id} /> : null}
-          <div className="node__word__content">
-            {/* Node Word Label */}
-            <div className={`node__word__label ${wideRollup ? "node__word__label--wide" : ""}`}>
-              <div className="node__word__label__siblings">
-                <span className="node__word__label__headword" id={"node-" + data.id + "-word"}>{data.word}</span>
-                {hasRollup ? (<span className="node__word__label__rollup" id={"node-" + data.id + "-span"}>{rollupText}</span>) : null}
-              </div>
+  return (
+    !isRoot ? (
+      <div className={`node__word
+          ${hasInsideChildren && data.attributes.length > 0 ? "node__word--has-attrs" : ""}
+          ${hasRollup ? "node__word--has-rollup" : ""}`}>
+        {/* Node Word Tile */}
+        <div className="node__word__tile"></div>
+        {/* Left / Top Link */}
+        {((!isEventRoot && data.link && layout === "canonical") ||
+          (!isEventRoot && data.link && layout === "default" && positions[data.link] !== "left" && notFirstInsideChild && !encapsulated && !eventSeqChild)) ?
+          <Link link={data.link} dataPos={dataPos} layout={layout} linkLabels={linkLabels} id={data.id} /> : null}
+        <div className="node__word__content">
+          {/* Node Word Label */}
+          <div className={`node__word__label ${wideRollup ? "node__word__label--wide" : ""}`}>
+            <div className="node__word__label__siblings">
+              <span className="node__word__label__headword" id={"node-" + data.id + "-word"}>{data.word}</span>
+              {hasRollup ? (<span className="node__word__label__rollup" id={"node-" + data.id + "-span"}>{rollupText}</span>) : null}
             </div>
-            {hasInsideChildren ? insideChildren : null}
-            {/* Attributes */}
-            <Attributes attrs={data.attributes} id={data.id} />
           </div>
-          {/* Right Link */}
-          {(!encapsulated && !eventSeqChild && data.link && layout === "default" && positions[data.link] === "left") ?
-            <Link link={data.link} dataPos={dataPos} layout={layout} linkLabels={linkLabels} id={data.id} /> : null}
-          {focusTrigger}
-          {/* UI Toggle */}
-          {(dataCollapsable) ? toggle : null}
-          {(altParses) ? parseNav : null}
-        </div>) : (
-          (altParses) ? (
-            <div className="node__segments">
-              {focusTrigger}
-              {(altParses) ? parseNav : null}
-            </div>
-        ) : null
-      )
-    );
-  }
+          {hasInsideChildren ? insideChildren : null}
+          {/* Attributes */}
+          <Attributes attrs={data.attributes} id={data.id} />
+        </div>
+        {/* Right Link */}
+        {(!encapsulated && !eventSeqChild && data.link && layout === "default" && positions[data.link] === "left") ?
+          <Link link={data.link} dataPos={dataPos} layout={layout} linkLabels={linkLabels} id={data.id} /> : null}
+        {focusTrigger}
+        {/* UI Toggle */}
+        {(dataCollapsable) ? toggle : null}
+        {(altParses) ? parseNav : null}
+      </div>) : (
+        (altParses) ? (
+          <div className="node__segments">
+            {focusTrigger}
+            {(altParses) ? parseNav : null}
+          </div>
+      ) : null
+    )
+  );
 }
 
 NodeWord.propTypes = {
