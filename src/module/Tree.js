@@ -19,8 +19,6 @@ import {
 } from './helpers';
 import IconSprite from './IconSprite';
 
-import './less/hierplane.less';
-
 const Tree = ({
   inputText,
   text,
