@@ -37,6 +37,7 @@
     "superagent": "3.7.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.0",
     "babel-plugin-transform-es2015-modules-commonjs": "6.26.0",
