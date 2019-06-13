@@ -18,7 +18,7 @@ const MainStage = ({
   styles,
   positions,
   linkLabels,
-  items,
+  roots,
   layout,
   text,
   fetchAltParse,
@@ -39,7 +39,7 @@ const MainStage = ({
   if (emptyQuery) {
     mainsStageContent = (<EmptyTree />);
   } else {
-    if (items && !errorState) {
+    if (roots && !errorState) {
       // TODO: remove readOnly, execute componentDidUpdate automatically when readOnly is true
       mainsStageContent = (
         <div 
@@ -55,7 +55,7 @@ const MainStage = ({
             className='main-stage__defocus-trigger' 
             onDoubleClick={() => dispatch(focusNode('defocus'))} 
           />
-          {items.map((item, idx) => (
+          {roots.map((root, idx) => (
             <Node
               key={idx}
               readOnly={readOnly}
@@ -65,8 +65,8 @@ const MainStage = ({
               positions={positions}
               linkLabels={linkLabels}
               loading={loading}
-              data={item}
-              isSingleSegment={isSingleSegment(item.nodeType)}
+              data={root}
+              isSingleSegment={isSingleSegment(root.nodeType)}
               layout={layout}
               depth={0}
               directionalChildIndex={0}

@@ -22,7 +22,7 @@ import IconSprite from './IconSprite';
 const Tree = ({
   inputText,
   text,
-  items,
+  roots,
   nodeTypeToStyle,
   linkToPosition,
   selectedData,
@@ -34,7 +34,7 @@ const Tree = ({
 }) => {
 
   const { state, dispatch } = useStore();
-  items = items.map((item, idx) => translateSpans(assignNodeIds(item, `${idx}.`)));
+  roots = roots.map((root, idx) => translateSpans(assignNodeIds(root, `${idx}.`)));
 
   const setCollapsible = (fetchedData, selectedData, includesSubTree = false) => {
     // If this is a new query, i.e., not an alternate parse, then clear the expandedNodeIds.
@@ -90,7 +90,7 @@ const Tree = ({
             inputText={inputText}
             onKeyPress={null}
             loading={loading}
-            items={items}
+            roots={roots}
             styles={nodeTypeToStyle}
             emptyQuery={emptyQuery}
             errorState={errorState} />
@@ -100,7 +100,7 @@ const Tree = ({
               styles={nodeTypeToStyle}
               positions={linkToPosition}
               linkLabels={{}}
-              items={items}
+              roots={roots}
               layout='default'
               text={text}
               loading={loading}

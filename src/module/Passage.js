@@ -15,7 +15,7 @@ const Passage = ({
   onKeyPress,
   onChange,
   loading,
-  items,
+  roots,
   styles,
   errorState,
 }) => {
@@ -117,11 +117,11 @@ const Passage = ({
       ) : null}
       <p onDoubleClick={!readOnly ? handleFocus : () => {}}>
         <span className="passage__readonly">
-          {items.map((item, idx) => (
+          {roots.map((root, idx) => (
               <PassageSpan
                 key={idx}
                 text={text}
-                data={item}
+                data={root}
                 styles={styles}
                 depth={0} 
               />
@@ -152,7 +152,7 @@ Passage.propTypes = {
   loading: PropTypes.bool,
   emptyQuery: PropTypes.bool,
   errorState: PropTypes.bool,
-  items: PropTypes.array,
+  roots: PropTypes.array,
   styles: PropTypes.object,
   selectedNodeId: PropTypes.string,
   hoverNodeId: PropTypes.string,
