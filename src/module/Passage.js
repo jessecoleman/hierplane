@@ -20,7 +20,8 @@ const Passage = ({
   errorState,
 }) => {
 
-  const { state: { selectedNodeId, hoverNodeId }, dispatch } = useStore();
+  const { state, dispatch } = useStore();
+  const { selectedNodeId, hoverNodeId } = state;
 
   const [ focused, setFocused ] = useState(false);
   const [ autoFocus, setAutoFocus ] = useState(null);
