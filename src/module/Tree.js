@@ -63,56 +63,41 @@ const Tree = ({
     };
   }
 
-  // TODO can I actually just dispatch locally?
-  const onFocusNode = () => {
-    console.log(data);
-    if (data !== 'defocus') {
-      dispatch(focusNode(data.id, data));
-      //if (this.state.firstFocus) {
-      //  this.setState({
-      //    firstFocus: false,
-      //  });
-      //}
-    } else {
-      dispatch(focusNode(null, null));
-    }
-  }
-
-  // render
-
   return (
-    <div className="hierplane hierplane--theme-light">
-      <div className="pane-container">
-        <div className="pane pane--scroll">
-          <Passage
-            readOnly={true}
-            text={text}
-            inputText={inputText}
-            onKeyPress={null}
-            loading={loading}
-            roots={roots}
-            styles={nodeTypeToStyle}
-            emptyQuery={emptyQuery}
-            errorState={errorState} />
-          <div className="pane pane--fill">
-            <MainStage
+    <StoreProvider>
+      <div className="hierplane hierplane--theme-light">
+        <div className="pane-container">
+          <div className="pane pane--scroll">
+            <Passage
               readOnly={true}
-              styles={nodeTypeToStyle}
-              positions={linkToPosition}
-              linkLabels={{}}
-              roots={roots}
-              layout='default'
               text={text}
+              inputText={inputText}
+              onKeyPress={null}
               loading={loading}
-              firstLoad={firstLoad}
+              roots={roots}
+              styles={nodeTypeToStyle}
               emptyQuery={emptyQuery}
-              errorState={errorState} 
-            />
+              errorState={errorState} />
+            <div className="pane pane--fill">
+              <MainStage
+                readOnly={true}
+                styles={nodeTypeToStyle}
+                positions={linkToPosition}
+                linkLabels={{}}
+                roots={roots}
+                layout='default'
+                text={text}
+                loading={loading}
+                firstLoad={firstLoad}
+                emptyQuery={emptyQuery}
+                errorState={errorState} 
+              />
+            </div>
           </div>
+          <IconSprite />
         </div>
-        <IconSprite />
       </div>
-    </div>
+    </StoreProvider>
   );
 }
 
