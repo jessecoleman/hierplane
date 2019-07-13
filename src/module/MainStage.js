@@ -44,7 +44,7 @@ const MainStage = ({
       mainsStageContent = (
         <div 
           className={`main-stage__tree-container ${rendered || readOnly ? 'main-stage--rendered' : ''}`}
-	  style={{
+	      style={{
             display: 'flex', 
             flexDirection: 'row', 
             justifyContent: 'center', 
@@ -55,7 +55,7 @@ const MainStage = ({
             className='main-stage__defocus-trigger' 
             onDoubleClick={() => dispatch(focusNode('defocus'))} 
           />
-          {roots.map((root, idx) => (
+          {roots.filter(r => r.render).map((root, idx) => (
             <Node
               key={idx}
               readOnly={readOnly}
