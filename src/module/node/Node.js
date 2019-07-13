@@ -200,7 +200,7 @@ const Node = ({
         {container !== 'sequence' 
           ? insertDefocusTrigger('node-children-container-defocus-trigger') 
           : insertSeqTrigger()}
-        {nodes.map((childNode, index) => (
+        {nodes.filter(n => n.render).map((childNode, index) => (
           <Node
             key={childNode.id}
             readOnly={readOnly}
