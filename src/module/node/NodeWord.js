@@ -57,7 +57,7 @@ const NodeWord = ({
     } else if (item.render) {
       return ` ${text.slice(item.lo, item.hi)} `;
     } else {
-      return null;
+      return ' ';
     }
   }) : null;
 
