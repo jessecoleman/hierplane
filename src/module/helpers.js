@@ -149,14 +149,12 @@ export function translateSpans(origNode) {
         .map(n => new Span(
           /* lo = */ n.alternateParseInfo.charNodeRoot.charLo,
           /* hi = */ n.alternateParseInfo.charNodeRoot.charHi,
-          /* render = */ n.render,
           /* spanType = */'child'
         ))
         .concat(
           (node.spans || []).map(span => new Span(
             /* lo = */ span.start,
             /* hi = */ span.end,
-            /* render = */ span.render,
             /* spanType = */ span.spanType || 'self'
           ))
         ).sort((first, second) => first.lo - second.lo);
@@ -222,10 +220,9 @@ function getAllChildSpans(node) {
 }
 
 class Span {
-  constructor(lo, hi, spanType, render) {
+  constructor(lo, hi, spanType) {
     this.lo = lo;
     this.hi = hi;
-    this.render = render;
     this.spanType = spanType;
   }
 }

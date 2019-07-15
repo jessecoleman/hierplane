@@ -54,10 +54,8 @@ const NodeWord = ({
       return (
         <strong key={index}> {text.slice(item.lo, item.hi)} </strong>
       );
-    } else if (item.render) {
-      return ` ${text.slice(item.lo, item.hi)} `;
     } else {
-      return ' ';
+      return ` ${text.slice(item.lo, item.hi)} `;
     }
   }) : null;
 
