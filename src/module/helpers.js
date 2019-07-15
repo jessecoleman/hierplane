@@ -146,16 +146,17 @@ export function translateSpans(origNode) {
     const spanAnnotations =
       (node.children || [])
         .filter(n => n.alternateParseInfo && n.alternateParseInfo.charNodeRoot)
-        .filter(n => n.render)
         .map(n => new Span(
           /* lo = */ n.alternateParseInfo.charNodeRoot.charLo,
           /* hi = */ n.alternateParseInfo.charNodeRoot.charHi,
+          /* render = */ n.render,
           /* spanType = */'child'
         ))
         .concat(
           (node.spans || []).map(span => new Span(
             /* lo = */ span.start,
             /* hi = */ span.end,
+            /* render = */ span.render,
             /* spanType = */ span.spanType || 'self'
           ))
         ).sort((first, second) => first.lo - second.lo);
@@ -221,9 +222,10 @@ function getAllChildSpans(node) {
 }
 
 class Span {
-  constructor(lo, hi, spanType) {
+  constructor(lo, hi, spanType, render) {
     this.lo = lo;
     this.hi = hi;
+    this.render = render;
     this.spanType = spanType;
   }
 }
