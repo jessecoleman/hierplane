@@ -146,6 +146,7 @@ export function translateSpans(origNode) {
     const spanAnnotations =
       (node.children || [])
         .filter(n => n.alternateParseInfo && n.alternateParseInfo.charNodeRoot)
+        .filter(n => n.render)
         .map(n => new Span(
           /* lo = */ n.alternateParseInfo.charNodeRoot.charLo,
           /* hi = */ n.alternateParseInfo.charNodeRoot.charHi,
