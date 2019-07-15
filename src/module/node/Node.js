@@ -64,7 +64,7 @@ const Node = ({
   // Returns arrays of children grouped by positions set in
   // linkToPosition in the JSON:
   const createChildren = (children, positions) => {
-    return children.reduce((children, child) => {
+    return children.filter(c => c.render).reduce((children, child) => {
       let index = positions[child.link]
       if (index in children) {
         children[index].push(child);
