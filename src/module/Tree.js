@@ -66,7 +66,7 @@ const Tree = ({
 
   return (
     <StoreProvider>
-      <div className=`hierplane hierplane--theme-${light}`>
+      <div className=`hierplane hierplane--theme-${theme || 'light'}`>
         <div className="pane-container">
           <div className="pane pane--scroll">
             <Passage
