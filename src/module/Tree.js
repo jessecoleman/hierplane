@@ -18,12 +18,12 @@ import {
   translateSpans
 } from './helpers';
 import IconSprite from './IconSprite';
-import css from '../static/hierplane.min.css';
 
 const Tree = ({
   inputText,
   text,
   roots,
+  theme,
   nodeTypeToStyle,
   linkToPosition,
   selectedData,
@@ -66,7 +66,7 @@ const Tree = ({
 
   return (
     <StoreProvider>
-      <div className="hierplane hierplane--theme-light">
+      <div className=`hierplane hierplane--theme-${light}`>
         <div className="pane-container">
           <div className="pane pane--scroll">
             <Passage

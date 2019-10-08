@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
 const browserify = require('browserify');
-const browserifyCss = require('browserify-css');
+const bundlecss = require('bundle-css');
 const watchify = require('watchify');
 
 // Whenever we incoke `cp.exec` or `cp.execSync` these args set the correct
@@ -118,11 +118,13 @@ function compileLess() {
  */
 function bundleJavascript() {
   const bundleEntryPath = path.resolve(__dirname, '..', 'dist', 'static', 'hierplane.js');
+  const cssEntryPath = path.resolve(__dirname, '..', 'dist', 'static', 'hierplane.min.css');
+  console.log(cssEntryPath);
   const bundlePath = path.resolve(__dirname, '..', 'dist', 'static', 'hierplane.bundle.js');
 
   // Put together our "bundler", which uses browserify
   const browserifyOpts = {
-    entries: [ bundleEntryPath ],
+    entries: [ bundleEntryPath ], //, cssEntryPath ],
     standalone: 'hierplane'
   };
 
@@ -133,7 +135,7 @@ function bundleJavascript() {
     browserifyOpts.cache = {};
 
     // Enable the plugin
-    browserifyOpts.plugin = [ watchify, browserifyCss ];
+    browserifyOpts.plugin = [ watchify ]; //, bundlecss ];
   };
 
   // Construct the bundler
