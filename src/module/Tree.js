@@ -18,7 +18,7 @@ import {
   translateSpans
 } from './helpers';
 import IconSprite from './IconSprite';
-import '../less/hierplane.less';
+import css from '../static/hierplane.min.css';
 
 const Tree = ({
   inputText,

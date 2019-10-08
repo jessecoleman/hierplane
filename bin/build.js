@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
 const browserify = require('browserify');
+const browserifyCss = require('browserify-css');
 const watchify = require('watchify');
 
 // Whenever we incoke `cp.exec` or `cp.execSync` these args set the correct
@@ -30,8 +31,8 @@ const shouldSkipFirstBuild = isWatchTarget && (args.has('--skipInitial') || args
 // Build n' bundle the JS and CSS
 if (!shouldSkipFirstBuild) {
   compileJavascript();
-  bundleJavascript();
   compileLess();
+  bundleJavascript();
 } else {
   console.log(chalk.yellow('skipping first build, as --skipInitial was passed'));
 }
@@ -132,7 +133,7 @@ function bundleJavascript() {
     browserifyOpts.cache = {};
 
     // Enable the plugin
-    browserifyOpts.plugin = [ watchify ];
+    browserifyOpts.plugin = [ watchify, browserifyCss ];
   };
 
   // Construct the bundler
