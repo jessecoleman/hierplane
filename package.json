@@ -1,6 +1,6 @@
 {
   "name": "hierplane",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "A javascript library for visualizing hierarchical data, specifically tailored towards rendering dependency parses.",
   "files": [
     "dist/**/*.js",
@@ -48,6 +48,7 @@
     "babel-runtime": "6.26.0",
     "browserify": "14.5.0",
     "browserify-css": "^0.15.0",
+    "bundle-css": "^0.0.7",
     "chai": "3.5.0",
     "chalk": "2.3.0",
     "chokidar": "1.7.0",
